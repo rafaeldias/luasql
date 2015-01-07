@@ -395,6 +395,10 @@ static int conn_execute (lua_State *L) {
 	conn_data *conn = getconnection (L);
 	size_t st_len;
 	const char *statement = luaL_checklstring (L, 2, &st_len);
+
+  /* set MYSQL_OPT_LOCAL_INFILE  */
+  mysql_options(conn->my_conn, MYSQL_OPT_LOCAL_INFILE, 1);
+
 	if (mysql_real_query(conn->my_conn, statement, st_len)) 
 		/* error executing query */
 		return luasql_failmsg(L, "error executing query. MySQL: ", mysql_error(conn->my_conn));
