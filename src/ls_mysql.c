@@ -396,8 +396,6 @@ static int conn_execute (lua_State *L) {
 	size_t st_len;
 	const char *statement = luaL_checklstring (L, 2, &st_len);
 
-  /* set MYSQL_OPT_LOCAL_INFILE  */
-  mysql_options(conn->my_conn, MYSQL_OPT_LOCAL_INFILE, 1);
 
 	if (mysql_real_query(conn->my_conn, statement, st_len)) 
 		/* error executing query */
@@ -496,6 +494,7 @@ static int env_connect (lua_State *L) {
 	const char *password = luaL_optstring(L, 4, NULL);
 	const char *host = luaL_optstring(L, 5, NULL);
 	const int port = luaL_optint(L, 6, 0);
+        int opt_local_infile = 1;
 	MYSQL *conn;
 	getenvironment(L); /* validade environment */
 
@@ -503,6 +502,9 @@ static int env_connect (lua_State *L) {
 	conn = mysql_init(NULL);
 	if (conn == NULL)
 		return luasql_faildirect(L, "error connecting: Out of memory.");
+
+        /* set MYSQL_OPT_LOCAL_INFILE  */
+        mysql_options(conn, MYSQL_OPT_LOCAL_INFILE, (char *) &opt_local_infile);
 
 	if (!mysql_real_connect(conn, host, username, password, 
 		sourcename, port, NULL, 0))
